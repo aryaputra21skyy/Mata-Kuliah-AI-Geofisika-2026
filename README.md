@@ -1,0 +1,1 @@
+# Mata-Kuliah-AI-Geofisika-2026
