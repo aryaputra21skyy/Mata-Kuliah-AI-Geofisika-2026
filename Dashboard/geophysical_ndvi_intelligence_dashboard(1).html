@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GeoNDVI Intelligence | Satellite & Climate Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--bg:#080d18;--panel:#111a2b;--panel2:#141f32;--line:#25334b;--text:#edf4ff;--muted:#92a4c2;--teal:#44e0c1;--blue:#7194ff;--violet:#b29aff;--amber:#ffc76b;--pink:#f18cba;--red:#ff7c86}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#183b4b55,transparent 35%),radial-gradient(ellipse at 90% 0%,#3a2a7050,transparent 35%),var(--bg);color:var(--text);font-family:'DM Sans',sans-serif}
+header{padding:30px clamp(18px,4vw,58px) 28px;border-bottom:1px solid #ffffff12;position:relative;overflow:hidden;background:linear-gradient(115deg,#10172a,#182548 55%,#103b43)}
+header:after{content:"";position:absolute;right:-3%;top:-100px;width:43%;height:360px;background-image:radial-gradient(#ffffffa0 .7px,transparent .8px);background-size:14px 14px;opacity:.17;mask-image:linear-gradient(90deg,transparent,black)}
+.head{max-width:1600px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:20px;position:relative;z-index:1}
+.brand{display:flex;gap:13px;align-items:center}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#44e0c1,#7194ff);display:grid;place-items:center;color:#07131e;font-size:23px;box-shadow:0 10px 28px #44e0c133}
+.eyebrow{color:var(--teal);font-size:10px;letter-spacing:.2em;font-weight:800;text-transform:uppercase}.title{font:800 clamp(25px,3vw,39px) Manrope,sans-serif;letter-spacing:-.045em;margin:5px 0}.sub{color:#a9bad5;font-size:13px;line-height:1.7;max-width:780px}
+.meta{border:1px solid #ffffff25;background:#ffffff0d;padding:13px 16px;border-radius:14px;min-width:180px;backdrop-filter:blur(10px)}.meta small{display:block;color:#9eafc9;font-size:10px;letter-spacing:.1em}.meta b{display:block;margin-top:5px;font-size:14px}
+main{max-width:1600px;margin:auto;padding:24px clamp(14px,3vw,40px) 50px}.toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.pill{border:1px solid #2b4358;border-radius:99px;padding:8px 12px;font-size:11px;color:#c3d3e8;background:#111a2b}.live{color:var(--teal);border-color:#1b655a;background:#102a2b}.filters{display:flex;gap:8px;flex-wrap:wrap}select,button{font:600 11px 'DM Sans';color:var(--text);background:#131e30;border:1px solid #2a3b56;border-radius:10px;padding:10px 12px;cursor:pointer}button:hover{border-color:var(--teal);transform:translateY(-1px)}
+.grid{display:grid;gap:14px}.kpis{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:14px}.kpi{position:relative;overflow:hidden;background:linear-gradient(145deg,#141f32,#101827);border:1px solid var(--line);border-radius:17px;padding:18px 19px;min-height:128px;box-shadow:0 15px 36px #0002}.kpi:after{content:"";position:absolute;width:115px;height:115px;border-radius:50%;right:-48px;top:-48px;background:var(--glow,#44e0c1);opacity:.11;filter:blur(2px)}
+.kpi-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:700}.kpi-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:#ffffff0b;color:var(--accent,var(--teal));font-size:15px}.value{font:800 clamp(23px,2.3vw,31px) Manrope;letter-spacing:-.04em;margin:12px 0 5px}.hint{font-size:11px;color:var(--muted)}.hint strong{color:var(--accent,var(--teal))}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:10px;margin:27px 2px 12px}.section-head h2{font:800 17px Manrope;letter-spacing:-.025em;margin:0}.section-head p{margin:5px 0 0;color:var(--muted);font-size:11px}.section-head .rule{height:3px;width:42px;border-radius:4px;background:linear-gradient(90deg,var(--teal),var(--blue));margin-bottom:9px}
+.two{grid-template-columns:1.35fr 1fr}.three{grid-template-columns:1fr 1fr 1fr}.panel{min-width:0;background:linear-gradient(145deg,#131e30,#101827);border:1px solid var(--line);border-radius:17px;padding:17px;box-shadow:0 15px 36px #0002}.panel-title{display:flex;justify-content:space-between;gap:12px;align-items:start;margin-bottom:12px}.panel-title h3{font:700 13px Manrope;margin:0}.panel-title p{font-size:10px;color:var(--muted);margin:5px 0 0}.chart{height:270px;position:relative}.chart.tall{height:340px}.legend-note{font-size:10px;color:var(--muted);line-height:1.7;margin-top:10px}
+.insights{grid-template-columns:repeat(3,1fr)}.insight{border:1px solid var(--line);border-radius:15px;background:linear-gradient(135deg,#142337,#111a2a);padding:16px}.insight .tag{font-size:9px;letter-spacing:.13em;font-weight:800;color:var(--teal)}.insight h4{font:700 13px Manrope;margin:9px 0 6px}.insight p{font-size:11px;color:#a0b0ca;line-height:1.7;margin:0}
+.table-wrap{overflow:auto;max-height:420px;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;font-size:11px;white-space:nowrap}thead{position:sticky;top:0;background:#1a2740;z-index:1}th,td{padding:11px 12px;text-align:right;border-bottom:1px solid #25334b}th{color:#b4c4dd;font-size:10px;text-transform:uppercase;letter-spacing:.05em}td:first-child,th:first-child{text-align:left}tbody tr:hover{background:#ffffff08}.bar{display:inline-block;width:66px;height:5px;border-radius:9px;background:#283a54;vertical-align:middle;margin-right:8px;overflow:hidden}.bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--teal),var(--blue))}
+.footer{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:#7185a5;font-size:10px;margin-top:20px;line-height:1.7}.footer a{color:var(--teal);text-decoration:none}
+@media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}.two,.three{grid-template-columns:1fr}.insights{grid-template-columns:1fr}.meta{display:none}.chart{height:250px}}
+@media(max-width:520px){.kpis{grid-template-columns:1fr 1fr}.kpi{padding:13px;min-height:115px}.value{font-size:22px}.title{font-size:25px}.logo{width:40px;height:40px}}
+
+.map-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(250px,.75fr);gap:14px}
+.map-panel{padding:0;overflow:hidden}
+.map-topline{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:17px 17px 12px}
+.map-topline h3{font:700 13px Manrope;margin:0}.map-topline p{font-size:10px;color:var(--muted);margin:5px 0 0;line-height:1.6}
+.map-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.map-badge{font-size:9px;padding:6px 8px;border:1px solid var(--line);border-radius:999px;color:#c3d3e8;background:#ffffff05;white-space:nowrap}
+#ndviMap{height:470px;width:100%;background:#111a2b;z-index:1}
+.leaflet-container{font-family:'DM Sans',sans-serif}
+.leaflet-control-layers,.leaflet-bar a{background:#111a2b!important;color:#edf4ff!important;border-color:#33435c!important}
+.leaflet-control-layers label{color:#d9e5f5;font-size:11px}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#111a2b;color:#edf4ff;border:1px solid #31415b;box-shadow:0 10px 28px #0005}
+.leaflet-popup-content{font:11px 'DM Sans',sans-serif;line-height:1.7}
+.map-side{display:flex;flex-direction:column;gap:12px}
+.map-legend{display:grid;gap:10px;padding:16px}
+.legend-row{display:flex;align-items:center;gap:9px;font-size:11px;color:#b7c7de}
+.legend-dot{width:10px;height:10px;border-radius:50%;box-shadow:0 0 0 3px #ffffff0b;flex:0 0 auto}
+.map-stat{padding:15px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,#142337,#101827)}
+.map-stat small{font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;font-weight:800}
+.map-stat strong{display:block;font:800 22px Manrope;margin:7px 0 3px;letter-spacing:-.04em}
+.map-stat p{font-size:10px;color:#a0b0ca;line-height:1.7;margin:0}
+.map-disclaimer{font-size:10px;line-height:1.75;color:#879bb9;padding:0 17px 15px}
+@media(max-width:900px){.map-layout{grid-template-columns:1fr}#ndviMap{height:380px}.map-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.map-legend{grid-column:1/-1}}
+@media(max-width:520px){#ndviMap{height:340px}.map-side{grid-template-columns:1fr}.map-topline{flex-direction:column}}
+
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+</head><body>
+<header><div class="head"><div class="brand"><div class="logo">⌁</div><div><div class="eyebrow">Earth Observation · Geophysical Environment</div><h1 class="title">GeoNDVI Intelligence</h1><div class="sub">Satellite vegetation signals, thermal conditions, rainfall, drought and soil moisture — an interactive environmental intelligence workspace.</div></div></div><div class="meta"><small>DATA WINDOW</small><b>2018 — 2024</b><small style="margin-top:8px">PROVINCE-LEVEL PANEL</small></div></div></header>
+<main>
+<div class="toolbar"><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="pill live">● DATA READY</span><span class="pill">34 provinces · 2024 snapshot</span><span class="pill">South Sulawesi · 7-year trend</span></div><div class="filters"><select id="metric"><option value="NDVI">Metric: NDVI</option><option value="Rainfall">Rainfall</option><option value="LST">Land Surface Temperature</option><option value="PDSI">Drought Index (PDSI)</option><option value="SoilMoisture">Soil Moisture</option></select><select id="sort"><option value="desc">Sort: Highest first</option><option value="asc">Sort: Lowest first</option></select><button id="reset">Reset view ↺</button><button id="export">Export visible CSV ↓</button></div></div>
+<div class="grid kpis" id="kpis"></div>
+
+<div class="section-head"><div><div class="rule"></div><h2>Spatial explorer · Indonesia</h2><p>Explore the province-level NDVI snapshot on a geographic basemap.</p></div><span class="pill">Interactive map · 2024</span></div>
+<div class="map-layout">
+  <section class="panel map-panel">
+    <div class="map-topline"><div><h3>NDVI station map</h3><p>Circle color represents the 2024 province-average NDVI value.</p></div><div class="map-badges"><span class="map-badge">34 records</span><span class="map-badge">Switchable basemap</span></div></div>
+    <div id="ndviMap" role="application" aria-label="Interactive map of representative locations for province-level NDVI values"></div>
+    <div class="map-disclaimer">Important: markers are representative locations (generally provincial capitals), not exact raster pixels or province polygons. The NDVI value belongs to the province-level annual aggregate. Use the basemap selector to switch between street map, satellite imagery, and terrain from Esri. Internet access is required for map tiles.</div>
+  </section>
+  <aside class="map-side">
+    <section class="panel map-legend"><div class="panel-title"><div><h3>NDVI legend</h3><p>Greenness classes for this dashboard</p></div></div>
+      <div class="legend-row"><span class="legend-dot" style="background:#f18cba"></span><span>Lower NDVI · below 0.40</span></div>
+      <div class="legend-row"><span class="legend-dot" style="background:#ffc76b"></span><span>Moderate · 0.40–0.59</span></div>
+      <div class="legend-row"><span class="legend-dot" style="background:#44e0c1"></span><span>Higher NDVI · 0.60 and above</span></div>
+      <div class="legend-note">Circle size is proportional to NDVI. Select a marker to inspect NDVI, LST, rainfall, PDSI and soil-moisture values.</div>
+    </section>
+    <div class="map-stat"><small>Selected metric</small><strong id="mapMetricValue">NDVI</strong><p id="mapMetricNote">Circle colors show province-level NDVI.</p></div>
+    <div class="map-stat"><small>Highest NDVI</small><strong id="mapHighName">—</strong><p id="mapHighValue">Loading province summary…</p></div>
+    <div class="map-stat"><small>South Sulawesi</small><strong id="mapSulselValue">—</strong><p>Annual province average for 2024. Marker is placed at Makassar as a representative location.</p></div>
+  </aside>
+</div>
+
+<div class="section-head"><div><div class="rule"></div><h2>Environmental signal overview</h2><p>Compare vegetation condition against thermal and hydroclimatic variables.</p></div><span class="pill">2024 · Annual aggregation</span></div>
+<div class="grid two">
+<section class="panel"><div class="panel-title"><div><h3>NDVI profile · South Sulawesi</h3><p>Annual vegetation signal across the 2018–2024 period</p></div><span class="pill">Time series</span></div><div class="chart"><canvas id="trend"></canvas></div><div class="legend-note">NDVI ranges from −1 to +1. Higher positive values generally indicate greener vegetation; interpretation depends on land cover and seasonal context.</div></section>
+<section class="panel"><div class="panel-title"><div><h3>Vegetation vs. thermal signal</h3><p>Cross-province relationship · 2024</p></div><span class="pill">Scatter analysis</span></div><div class="chart"><canvas id="scatter"></canvas></div><div class="legend-note">Each point represents one province. Correlation is descriptive and does not establish causality.</div></section>
+</div>
+<div class="section-head"><div><div class="rule"></div><h2>Hydroclimate context</h2><p>Environmental drivers that can help interpret changes in vegetation.</p></div></div>
+<div class="grid three">
+<section class="panel"><div class="panel-title"><div><h3>NDVI by province</h3><p>Top / bottom performers in 2024</p></div></div><div class="chart tall"><canvas id="rank"></canvas></div></section>
+<section class="panel"><div class="panel-title"><div><h3>Rainfall vs. NDVI</h3><p>Annual rainfall total against vegetation index</p></div></div><div class="chart tall"><canvas id="rain"></canvas></div></section>
+<section class="panel"><div class="panel-title"><div><h3>Soil moisture &amp; PDSI</h3><p>Context indicators for water availability</p></div></div><div class="chart tall"><canvas id="water"></canvas></div></section>
+</div>
+<div class="section-head"><div><div class="rule"></div><h2>Automated observation notes</h2><p>Rule-based highlights from the selected data extract.</p></div></div>
+<div class="grid insights" id="insights"></div>
+<div class="section-head"><div><div class="rule"></div><h2>Province-level data explorer</h2><p>Search, sort and inspect the 2024 snapshot. Export the visible table to CSV.</p></div><input id="search" placeholder="Search province…" style="max-width:230px;width:100%;background:#131e30;color:var(--text);border:1px solid #2a3b56;border-radius:10px;padding:10px 12px"></div>
+<section class="panel"><div class="table-wrap"><table><thead><tr><th>Province</th><th>NDVI</th><th>Rainfall (mm)</th><th>LST (°C)</th><th>PDSI</th><th>Soil moisture</th><th>NDVI level</th></tr></thead><tbody id="tbody"></tbody></table></div></section>
+<div class="footer"><div>Source dataset: <a href="https://doi.org/10.5281/zenodo.21507865" target="_blank" rel="noopener">Zenodo · Indonesia Province Climate–Vegetation Panel Dataset (2018–2024)</a><br>NDVI source cited by repository: MODIS MOD13Q1 · LST: MODIS MOD11A2 · rainfall: CHIRPS · PDSI: TerraClimate · soil moisture: SMAP.</div><div>Resolution of analysis: province-year aggregation<br>Dashboard is exploratory, not a substitute for pixel-level remote-sensing processing.</div></div>
+</main>
+<script>
+const DATA = {"province2024": [["Aceh", 2024, 2592.7574909396644, 0.7624466859878303, 25.959162451506533, 2.097569290984895, 0.3423059101636583], ["Bali", 2024, 2117.3340110322147, 0.6899347295942274, 26.894108393149164, -2.217850515844453, 0.1910412468677995], ["Bangka Belitung", 2024, 3277.803622228236, 0.6408696231377333, 28.656531926375514, -1.3203906331890778, 0.2942851569123468], ["Banten", 2024, 3563.2210210252, 0.6391132232510925, 28.92289129755768, -2.8728081216640597, 0.3169884513831464], ["Bengkulu", 2024, 3001.484959888292, 0.7841348189761738, 26.80760234051049, 1.3363972634970145, 0.2967244498838922], ["Gorontalo", 2024, 1925.058821420152, 0.750287211232125, 26.92830901090897, 0.5240677032818651, 0.2447913629892001], ["Jakarta Raya", 2024, 2119.0118987371925, 0.2816207441033748, 36.19350134256821, -3.3444577341003505, 0.3731186221087322], ["Jambi", 2024, 2757.2105570009458, 0.6620071434667998, 27.42339701236881, 0.6183597385046865, 0.3856788237818048], ["Jawa Barat", 2024, 3014.105254052957, 0.6489680840440657, 28.27891711481088, -2.113173930241825, 0.3284406489617656], ["Jawa Tengah", 2024, 2789.7756600004864, 0.6361287975957369, 29.12150928966115, -2.797935649760895, 0.3274477497173239], ["Jawa Timur", 2024, 2087.73841114106, 0.6446196594999316, 29.430462231196973, -2.962640388050992, 0.2758710102778671], ["Kalimantan Barat", 2024, 3953.3639092083367, 0.7056004991252147, 27.302987620014274, 3.865215006564902, 0.4081723982793112], ["Kalimantan Selatan", 2024, 2889.629820174295, 0.6966051619361807, 27.98336267160609, -0.0999130236261687, 0.377320531660028], ["Kalimantan Tengah", 2024, 3452.024565634056, 0.6810924369888623, 26.966593524694265, 2.366652641325991, 0.4063084296891815], ["Kalimantan Timur", 2024, 2880.2671860288383, 0.6805386720059775, 26.61843882228997, -0.0999093877602296, 0.3202570426908102], ["Kalimantan Utara", 2024, 3525.6731293840003, 0.6769453331529955, 24.24901288017972, 2.806075534576774, 0.3839130448430783], ["Kepulauan Riau", 2024, 2861.83640305928, 0.6130268088480181, 27.77801139628868, 3.15935477480286, 0.2430669026411941], ["Lampung", 2024, 2968.2776370513275, 0.6589634326529771, 29.02169777108838, -2.439135454334184, 0.2874673685007872], ["Maluku", 2024, 3160.9585774332777, 0.7176074948073549, 26.02133271614897, -0.6013268954477176, 0.316086643564234], ["Maluku Utara", 2024, 2882.8438632108496, 0.7344694709411748, 26.102026537200604, 0.6597568425490548, 0.2757716668108509], ["Nusa Tenggara Barat", 2024, 1945.880330259652, 0.6773561958124985, 28.210089538830456, -3.6056608574678175, 0.2333674902358926], ["Nusa Tenggara Timur", 2024, 1791.5484556808, 0.7009666371707365, 28.122902282784786, -0.8698096089314973, 0.266855668167733], ["Papua", 2024, 3708.984514846369, 0.6596194595944882, 24.864380420855863, 1.423672591649212, 0.4644785696913753], ["Papua Barat", 2024, 3837.319729912535, 0.7086904217328419, 25.66362538486917, 1.7416207301878186, 0.4341101278621643], ["Riau", 2024, 2843.051787421874, 0.6860858453754612, 28.374243702187503, 4.0773381479682005, 0.5371637785731739], ["Sulawesi Barat", 2024, 3010.148873695812, 0.7824239042299619, 25.399883931388374, -0.8141855329068483, 0.2893759161313496], ["Sulawesi Selatan", 2024, 3369.85381187627, 0.6610739741743776, 26.325778285406948, -1.1352409055183437, 0.3035125314046444], ["Sulawesi Tengah", 2024, 2545.4656151551103, 0.7246867464203008, 25.364855475494046, -0.1318072439217957, 0.2780867289475582], ["Sulawesi Tenggara", 2024, 2693.1142836217687, 0.7150214503272923, 26.11639531928393, -0.1963429094707669, 0.334885206347388], ["Sulawesi Utara", 2024, 2701.225093124516, 0.7594566910219366, 25.894145077064525, 0.6774761027638747, 0.2605881979266413], ["Sumatera Barat", 2024, 3241.901465568989, 0.7074059158423667, 26.28023876225442, 3.036849469270796, 0.3711048513653135], ["Sumatera Selatan", 2024, 2946.3897324004683, 0.6836575800042529, 28.07004286693629, -0.8843190132086924, 0.4247912045311673], ["Sumatera Utara", 2024, 2866.6439295149685, 0.7162451791456326, 27.085320189362434, 5.87987690377331, 0.3720998620693879], ["Yogyakarta", 2024, 2198.865950306189, 0.6353429277360516, 29.69534069892954, -4.114237834311805, 0.3057266291633311]], "southSulawesi": [["Sulawesi Selatan", 2018, 2475.4426531366166, 0.652367974314164, 27.71328294050592, 2.63333875140995, 0.3021643551953585], ["Sulawesi Selatan", 2019, 2141.8195070195407, 0.6586783994384553, 28.081297118267457, 3.24900497137107, 0.2686984966821541], ["Sulawesi Selatan", 2020, 3175.538063710353, 0.6566837008444658, 27.287278791038883, 0.7731666977577393, 0.3212258550938963], ["Sulawesi Selatan", 2021, 3580.305562837362, 0.6578638320273363, 26.932857026274053, 1.2944735801324372, 0.3521794022965989], ["Sulawesi Selatan", 2022, 3748.639488943024, 0.649895204188145, 26.34196793943838, 2.938926763606803, 0.3577838766109676], ["Sulawesi Selatan", 2023, 2320.136712905752, 0.6484394372097592, 27.45546765026544, 0.6405987409030034, 0.3033408836879537], ["Sulawesi Selatan", 2024, 3369.85381187627, 0.6610739741743776, 26.325778285406948, -1.1352409055183437, 0.3035125314046444]]};
+const prov = DATA.province2024.map(r=>({province:r[0],year:r[1],Rainfall:r[2],NDVI:r[3],LST:r[4],PDSI:r[5],SoilMoisture:r[6]}));
+const ss = DATA.southSulawesi.map(r=>({province:r[0],year:r[1],Rainfall:r[2],NDVI:r[3],LST:r[4],PDSI:r[5],SoilMoisture:r[6]}));
+const labels={NDVI:'NDVI',Rainfall:'Rainfall (mm)',LST:'LST (°C)',PDSI:'PDSI',SoilMoisture:'Soil moisture'};
+const colors={NDVI:'#44e0c1',Rainfall:'#7194ff',LST:'#ff9b75',PDSI:'#b29aff',SoilMoisture:'#ffc76b'};
+Chart.defaults.color='#91a3c1';Chart.defaults.font.family='DM Sans';Chart.defaults.font.size=10;
+Chart.defaults.plugins.legend.labels.usePointStyle=true;Chart.defaults.plugins.legend.labels.boxWidth=7;
+const gridColor='#25334b';
+function baseOpts(){return {responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9eafc9'}},tooltip:{backgroundColor:'#08111f',borderColor:'#334765',borderWidth:1,titleColor:'#fff',bodyColor:'#d8e4f5'}},scales:{x:{grid:{color:gridColor},ticks:{color:'#91a3c1'}},y:{grid:{color:gridColor},ticks:{color:'#91a3c1'}}}}}
+let charts={};
+function fmt(k,v){return k==='NDVI'?Number(v).toFixed(3):k==='Rainfall'?Number(v).toLocaleString('en-US',{maximumFractionDigits:0})+' mm':k==='LST'?Number(v).toFixed(1)+' °C':k==='PDSI'?Number(v).toFixed(2):Number(v).toFixed(3)}
+function level(n){return n>=.6?'High greenness':n>=.4?'Moderate greenness':'Low greenness'}
+function renderKPIs(){
+ const avg=k=>prov.reduce((a,r)=>a+r[k],0)/prov.length;
+ const arr=[['MEAN NDVI',avg('NDVI').toFixed(3),'34 provinces · 2024','⌁','#44e0c1'],['MEAN LST',avg('LST').toFixed(1)+' °C','Annual land surface temperature','◉','#ff9b75'],['MEAN RAINFALL',Math.round(avg('Rainfall')).toLocaleString()+' mm','Annual precipitation total','☂','#7194ff'],['MEAN SOIL MOISTURE',avg('SoilMoisture').toFixed(3),'Source variable units retained','≈','#ffc76b']];
+ document.getElementById('kpis').innerHTML=arr.map(a=>`<div class="kpi" style="--accent:${a[4]};--glow:${a[4]}"><div class="kpi-top"><span>${a[0]}</span><span class="kpi-icon">${a[3]}</span></div><div class="value">${a[1]}</div><div class="hint">${a[2]}</div></div>`).join('');
+}
+function makeCharts(){
+ if(charts.trend) Object.values(charts).forEach(c=>c.destroy());
+ let opt=baseOpts();
+ charts.trend=new Chart(document.getElementById('trend'),{type:'line',data:{labels:ss.map(r=>r.year),datasets:[{label:'NDVI',data:ss.map(r=>r.NDVI),borderColor:'#44e0c1',backgroundColor:'#44e0c122',fill:true,tension:.34,pointRadius:4,pointBackgroundColor:'#44e0c1',borderWidth:2.5}]},options:{...baseOpts(),scales:{x:{grid:{color:gridColor}},y:{min:0.55,max:.72,grid:{color:gridColor}}}}});
+ charts.scatter=new Chart(document.getElementById('scatter'),{type:'scatter',data:{datasets:[{label:'Provinces',data:prov.map(r=>({x:r.LST,y:r.NDVI,label:r.province})),backgroundColor:prov.map(r=>r.province==='Sulawesi Selatan'?'#ffc76b':'#7194ffbb'),pointRadius:prov.map(r=>r.province==='Sulawesi Selatan'?6:4)}]},options:{...baseOpts(),plugins:{...baseOpts().plugins,tooltip:{callbacks:{label:c=>`${c.raw.label}: LST ${c.raw.x.toFixed(1)}°C · NDVI ${c.raw.y.toFixed(3)}`}}},scales:{x:{title:{display:true,text:'LST (°C)'},grid:{color:gridColor}},y:{title:{display:true,text:'NDVI'},grid:{color:gridColor}}}}});
+ const sorted=[...prov].sort((a,b)=>b.NDVI-a.NDVI).slice(0,10);
+ charts.rank=new Chart(document.getElementById('rank'),{type:'bar',data:{labels:sorted.map(r=>r.province),datasets:[{label:'NDVI',data:sorted.map(r=>r.NDVI),backgroundColor:sorted.map(r=>r.province==='Sulawesi Selatan'?'#ffc76b':'#44e0c1bb'),borderRadius:5}]},options:{...baseOpts(),indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{min:0,max:1,grid:{color:gridColor}},y:{grid:{display:false}}}}});
+ charts.rain=new Chart(document.getElementById('rain'),{type:'scatter',data:{datasets:[{label:'Provinces',data:prov.map(r=>({x:r.Rainfall,y:r.NDVI,label:r.province})),backgroundColor:'#7194ffbb',pointRadius:4}]},options:{...baseOpts(),plugins:{...baseOpts().plugins,tooltip:{callbacks:{label:c=>`${c.raw.label}: ${Math.round(c.raw.x)} mm · NDVI ${c.raw.y.toFixed(3)}`}}},scales:{x:{title:{display:true,text:'Rainfall (mm)'},grid:{color:gridColor}},y:{title:{display:true,text:'NDVI'},grid:{color:gridColor}}}}});
+ charts.water=new Chart(document.getElementById('water'),{type:'scatter',data:{datasets:[{label:'Provinces',data:prov.map(r=>({x:r.SoilMoisture,y:r.PDSI,label:r.province})),backgroundColor:'#b29affbb',pointRadius:4}]},options:{...baseOpts(),plugins:{...baseOpts().plugins,tooltip:{callbacks:{label:c=>`${c.raw.label}: Soil moisture ${c.raw.x.toFixed(3)} · PDSI ${c.raw.y.toFixed(2)}`}}},scales:{x:{title:{display:true,text:'Soil moisture'},grid:{color:gridColor}},y:{title:{display:true,text:'PDSI'},grid:{color:gridColor}}}}});
+}
+function renderInsights(){
+ const avg=prov.reduce((a,r)=>a+r.NDVI,0)/prov.length;
+ const high=[...prov].sort((a,b)=>b.NDVI-a.NDVI)[0], low=[...prov].sort((a,b)=>a.NDVI-b.NDVI)[0];
+ const hot=[...prov].sort((a,b)=>b.LST-a.LST)[0], wet=[...prov].sort((a,b)=>b.Rainfall-a.Rainfall)[0];
+ const ssFirst=ss[0],ssLast=ss[ss.length-1],delta=ssLast.NDVI-ssFirst.NDVI;
+ document.getElementById('insights').innerHTML=[
+ {tag:'VEGETATION EXTREMES',title:`${high.province} has the highest NDVI`,text:`NDVI ${high.NDVI.toFixed(3)} in the 2024 snapshot. ${low.province} is lowest at ${low.NDVI.toFixed(3)}. Differences may reflect land cover and urbanization, not just climate.`},
+ {tag:'THERMAL SIGNAL',title:`${hot.province} records the highest LST`,text:`${hot.LST.toFixed(1)} °C in this dataset extract. High LST alongside low NDVI can be consistent with built-up surfaces, but needs spatial land-cover validation.`},
+ {tag:'SOUTH SULAWESI TREND',title:`NDVI changed ${delta>=0?'up':'down'} over 2018–2024`,text:`From ${ssFirst.NDVI.toFixed(3)} in 2018 to ${ssLast.NDVI.toFixed(3)} in 2024 (${delta>=0?'+':''}${delta.toFixed(3)}). The change is modest; annual averages can hide seasonal variation.`}
+ ].map(x=>`<article class="insight"><div class="tag">${x.tag}</div><h4>${x.title}</h4><p>${x.text}</p></article>`).join('');
+}
+function renderTable(){
+ const key=document.getElementById('metric').value,dir=document.getElementById('sort').value,q=document.getElementById('search').value.toLowerCase();
+ let arr=prov.filter(r=>r.province.toLowerCase().includes(q)).sort((a,b)=>dir==='desc'?b[key]-a[key]:a[key]-b[key]);
+ document.getElementById('tbody').innerHTML=arr.map(r=>`<tr><td>${r.province}</td><td>${r.NDVI.toFixed(3)}</td><td>${Math.round(r.Rainfall).toLocaleString()}</td><td>${r.LST.toFixed(2)}</td><td>${r.PDSI.toFixed(2)}</td><td>${r.SoilMoisture.toFixed(3)}</td><td><span class="bar"><i style="width:${Math.max(0,Math.min(100,r.NDVI*100))}%"></i></span>${level(r.NDVI)}</td></tr>`).join('');
+}
+function exportCSV(){const key=document.getElementById('metric').value,dir=document.getElementById('sort').value,q=document.getElementById('search').value.toLowerCase();let arr=prov.filter(r=>r.province.toLowerCase().includes(q)).sort((a,b)=>dir==='desc'?b[key]-a[key]:a[key]-b[key]);let lines=[['Province','Year','Rainfall_mm','NDVI','LST_C','PDSI','SoilMoisture'],...arr.map(r=>[r.province,r.year,r.Rainfall,r.NDVI,r.LST,r.PDSI,r.SoilMoisture])];let csv=lines.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download='geondvi_visible_data.csv';a.click();URL.revokeObjectURL(a.href)}
+document.getElementById('metric').addEventListener('change',renderTable);document.getElementById('sort').addEventListener('change',renderTable);document.getElementById('search').addEventListener('input',renderTable);document.getElementById('export').addEventListener('click',exportCSV);document.getElementById('reset').addEventListener('click',()=>{document.getElementById('metric').value='NDVI';document.getElementById('sort').value='desc';document.getElementById('search').value='';renderTable()});
+
+// Interactive geographic context map. Markers are representative province locations, not boundary choropleths.
+const PROVINCE_POINTS = {"Aceh": {"lat": 5.5483, "lon": 95.3238, "capital": "Banda Aceh"}, "Bali": {"lat": -8.6705, "lon": 115.2126, "capital": "Denpasar"}, "Bangka Belitung": {"lat": -2.1316, "lon": 106.1169, "capital": "Pangkalpinang"}, "Banten": {"lat": -6.12, "lon": 106.1503, "capital": "Serang"}, "Bengkulu": {"lat": -3.8004, "lon": 102.2655, "capital": "Bengkulu"}, "Gorontalo": {"lat": 0.5435, "lon": 123.0568, "capital": "Gorontalo"}, "Jakarta Raya": {"lat": -6.2088, "lon": 106.8456, "capital": "Jakarta"}, "Jambi": {"lat": -1.6101, "lon": 103.6131, "capital": "Jambi"}, "Jawa Barat": {"lat": -6.9175, "lon": 107.6191, "capital": "Bandung"}, "Jawa Tengah": {"lat": -6.9667, "lon": 110.4167, "capital": "Semarang"}, "Jawa Timur": {"lat": -7.2575, "lon": 112.7521, "capital": "Surabaya"}, "Kalimantan Barat": {"lat": -0.0263, "lon": 109.3425, "capital": "Pontianak"}, "Kalimantan Selatan": {"lat": -3.3194, "lon": 114.5908, "capital": "Banjarbaru / Banjarmasin"}, "Kalimantan Tengah": {"lat": -2.2096, "lon": 113.9213, "capital": "Palangka Raya"}, "Kalimantan Timur": {"lat": -0.5022, "lon": 117.1536, "capital": "Samarinda"}, "Kalimantan Utara": {"lat": 2.8375, "lon": 117.3653, "capital": "Tanjung Selor"}, "Kepulauan Riau": {"lat": 0.9186, "lon": 104.4665, "capital": "Tanjungpinang"}, "Lampung": {"lat": -5.3971, "lon": 105.2668, "capital": "Bandar Lampung"}, "Maluku": {"lat": -3.6954, "lon": 128.1814, "capital": "Ambon"}, "Maluku Utara": {"lat": 0.7907, "lon": 127.3842, "capital": "Sofifi / Ternate"}, "Nusa Tenggara Barat": {"lat": -8.5833, "lon": 116.1167, "capital": "Mataram"}, "Nusa Tenggara Timur": {"lat": -10.1772, "lon": 123.607, "capital": "Kupang"}, "Papua": {"lat": -2.5337, "lon": 140.7181, "capital": "Jayapura"}, "Papua Barat": {"lat": -0.8615, "lon": 134.062, "capital": "Manokwari"}, "Riau": {"lat": 0.5071, "lon": 101.4478, "capital": "Pekanbaru"}, "Sulawesi Barat": {"lat": -2.668, "lon": 118.8622, "capital": "Mamuju"}, "Sulawesi Selatan": {"lat": -5.1477, "lon": 119.4327, "capital": "Makassar"}, "Sulawesi Tengah": {"lat": -0.9003, "lon": 119.8779, "capital": "Palu"}, "Sulawesi Tenggara": {"lat": -3.9985, "lon": 122.5129, "capital": "Kendari"}, "Sulawesi Utara": {"lat": 1.4748, "lon": 124.8421, "capital": "Manado"}, "Sumatera Barat": {"lat": -0.9471, "lon": 100.4172, "capital": "Padang"}, "Sumatera Selatan": {"lat": -2.9761, "lon": 104.7754, "capital": "Palembang"}, "Sumatera Utara": {"lat": 3.5952, "lon": 98.6722, "capital": "Medan"}, "Yogyakarta": {"lat": -7.7956, "lon": 110.3695, "capital": "Yogyakarta"}};
+let ndviMap, ndviMarkers=[];
+function ndviColor(v){return v<0.4?'#f18cba':v<0.6?'#ffc76b':'#44e0c1'}
+function markerRadius(v){return 5 + Math.max(0,Math.min(1,Number(v)))*7}
+function initMap(){
+ if(!window.L || !document.getElementById('ndviMap')) {
+   document.getElementById('ndviMap').innerHTML='<div style="padding:25px;color:#b4c4dd">Peta membutuhkan koneksi internet untuk memuat Leaflet dan tile basemap.</div>'; return;
+ }
+ ndviMap=L.map('ndviMap',{zoomControl:true,scrollWheelZoom:false}).setView([-2.5,118],4.5);
+ // Use Esri basemap services by default to avoid blocked OpenStreetMap volunteer tile requests.
+ const street=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles &copy; Esri, HERE, Garmin, OpenStreetMap contributors'});
+ const satellite=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagery &copy; Esri and its imagery providers'});
+ const terrain=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles &copy; Esri, HERE, Garmin, OpenStreetMap contributors'});
+ street.addTo(ndviMap); L.control.layers({'Street map (Esri)':street,'Satellite imagery (Esri)':satellite,'Terrain (Esri)':terrain},null,{collapsed:false,position:'topright'}).addTo(ndviMap);
+ prov.forEach(r=>{
+   const p=PROVINCE_POINTS[r.province]; if(!p) return;
+   const marker=L.circleMarker([p.lat,p.lon],{radius:markerRadius(r.NDVI),color:'#08111f',weight:1.3,fillColor:ndviColor(r.NDVI),fillOpacity:.92});
+   marker.bindPopup(`<strong>${r.province}</strong><br>Representative location: ${p.capital}<hr style="border-color:#31415b"><b>NDVI:</b> ${r.NDVI.toFixed(3)}<br><b>Rainfall:</b> ${Math.round(r.Rainfall).toLocaleString()} mm<br><b>LST:</b> ${r.LST.toFixed(2)} °C<br><b>PDSI:</b> ${r.PDSI.toFixed(2)}<br><b>Soil moisture:</b> ${r.SoilMoisture.toFixed(3)}`);
+   marker.bindTooltip(`${r.province} · NDVI ${r.NDVI.toFixed(3)}`,{direction:'top',offset:[0,-5]});
+   marker.addTo(ndviMap); ndviMarkers.push({marker,row:r});
+ });
+ const hi=[...prov].sort((a,b)=>b.NDVI-a.NDVI)[0], ssrow=prov.find(r=>r.province==='Sulawesi Selatan');
+ document.getElementById('mapHighName').textContent=hi.province;
+ document.getElementById('mapHighValue').textContent=`NDVI ${hi.NDVI.toFixed(3)} · 2024 snapshot`;
+ document.getElementById('mapSulselValue').textContent=ssrow?ssrow.NDVI.toFixed(3):'—';
+ document.getElementById('metric').addEventListener('change',updateMapMetric);
+ updateMapMetric();
+ setTimeout(()=>ndviMap.invalidateSize(),250);
+}
+function updateMapMetric(){
+ if(!ndviMap) return;
+ const k=document.getElementById('metric').value;
+ document.getElementById('mapMetricValue').textContent=labels[k]||k;
+ document.getElementById('mapMetricNote').textContent=k==='NDVI'?'Circle color shows greenness class; circle size follows NDVI.':`Circle color now shows ${labels[k]||k}; marker size remains proportional to NDVI.`;
+ ndviMarkers.forEach(({marker,row})=>{
+   let val=row[k], color=k==='NDVI'?ndviColor(val):k==='Rainfall'?(val<2200?'#b29aff':val<3200?'#7194ff':'#44e0c1'):k==='LST'?(val<26?'#44e0c1':val<29?'#ffc76b':'#ff7c86'):k==='PDSI'?(val<0?'#ff7c86':val<2?'#ffc76b':'#44e0c1'):(val<.28?'#ff7c86':val<.36?'#ffc76b':'#44e0c1');
+   marker.setStyle({fillColor:color,radius:markerRadius(row.NDVI)});
+ });
+}
+
+renderKPIs();makeCharts();renderInsights();renderTable();initMap();
+</script></body></html>
